@@ -1,0 +1,65 @@
+Sources:
+http://plover.net/~agarvin/zorkbugs.txt
+https://www.microheaven.com/InfocomBugs/
+https://web.archive.org/web/20161031101004/http://www.xyzzynews.com/infocombugs.html
+https://intfiction.org/t/zork-iii-grue-repellant-and-ladder-bugs/73500
+http://www.graeme.50webs.com/infobugs/
+https://github.com/the-infocom-files/zork1/issues
+
+The `again` bug - the again command doesn't check scope. The directions are (usually) not registered with again.
+Applies to at least Zork1 + Zork2
+
+Zork1 (version 88):
+The `again` bug - the again command doesn't check scope. The directions are (usually) not registered with again.
+Anything in scope thrown at cyclops will be moved to the current room.
+Anything in scope thrown overboard will be moved to the current room.
+Dropping the nest (with the egg in it) from the "Up a Tree" location will always replace the egg with the broken egg, and won't do a check for the canary (thus allowing both normal and broken canaries). This also leaves the nest at "Up a Tree", too.
+The check for the drafty room is "no items bigger than size 4". The sack is size 3, and has an internal capacity big enough to put the candles in.
+The coal machine, which normally destroys all non-coal items, will only do this if the coal is not in the machine.
+You can overcome the size limit when taking readable things with `read x`.
+Anything in scope poured on the bell will cool it, and be deleted.
+The troll can get his axe back when knocked unconscious, if it is on the floor in the same rooms as the player, even if the troll is not there.
+The only item covered by the rising reservoir is the trunk of jewels.
+You can take the chalice if the thief is knocked unconscious, but not the other treasures.
+The raft and pile of plastic are two separate objects - you can carry a lot by filling the raft with (non-sharp) objects, deflating it, and picking up the pile of plastic.
+
+Zork2 (version 48):
+The `again` bug - the again command doesn't check scope. The directions are (usually) not registered with again.
+The `it` bug - once an it is set (via command, or a description), the game doesn't check that it is still in scope.
+Anything in scope thrown at the volcano gnome will be deleted.
+The sword is a treasure.
+`unlock door with x` has a 20% chance to move the key to the room (no skips, since the scenery bit is still set until post unicorn quest)
+Anything in scope dropped or poured while floating will be moved to the current room.
+Anything in scope thrown through the curtain travels to the other room.
+If you're in the bucket at Top of Well and tell the robot to go east, then there is no output, but you move to Tea Room--in the bucket! Now you can move from room to room by ordering the robot there, or you can go from Tea Room to Top of Well, in the bucket, by simply going WEST. While you're in the bucket, anything you drop goes in the bucket, even though it's not there. You can get out of the bucket using STAND. You can go to Circular Room using FILL POT (not GET WATER). If you eat the green cake in Tea Room you get the message about the room getting bigger, followed by, "You can't go there in a wooden bucket." You're still in Tea Room, but the robot is gone. If you go to Dingy Closet and try to get the red sphere you get the message about the cage and gas, followed by, "You can't go there in a wooden bucket." You're still in Dingy Closet and you can see the red sphere, but not the robot, so you can only get away using FILL POT, or STAND followed by NORTH. You have to get away within a few turns or be poisoned. After you do this, the cage is in the room, but not in the description. You can bring the robot back by getting trapped in the cage and freed from it in the normal way.
+If you die while holding a lit match, the match will stay lit permanently.
+The serpent follows orders, such as `serpent, get serpent`.
+When you respawn, so does the dragon, although it will not block you.
+Throwing anything at the robot destroys the robot, but you keep the item you threw.
+`filch` bypasses inventory limits.
+You can put more than one object in the balloon receptacle, but only when not in the basket.
+
+Zork3 (version 17):
+The `it` bug - once an it is set (via command, or a description), the game doesn't check that it is still in scope.
+Anything in scope thrown at the guardians will be deleted (yes, including the guardians).
+Anything in scope thrown at the ocean is deleted.
+Dropping more than 8 items in any royal puzzle room could cause them to appear one room east.
+Reading anything takeable in scope will perform a take action (including the ring from the locked cage, or the valuables from the man)
+You can carry the chest when the rope is tied to it, except for leaving cliff ledge.
+You can put the hood and cloak in the chest [untested: unlock things with them?] in order to get them from the figure.
+You can get the pile of valuables from the man via `put pile in chest`.
+You can drink from the closed vial.
+Solving the royal puzzle allows you to teleport to the Royal Puzzle Entrance at any point using `climb ladder`.
+Unlocking the cage with anything in scope moves it to your inventory.
+
+Enchanter (version 29):
+You can separate box and rope with `throw rope at x` (no skips, since the melbor scroll only appears after either kulcad or the dagger are used)
+Anything in scope broken with the jug or thrown at the jug will be deleted.
+Anything in scope used to fill the brook or ocean (`fill brook with x`) will be deleted.
+When the north gate is closed, you can walk through it going south.
+You can empty the jug remotely wile next to water with `fill x` or `get water`.
+You can gnusto spells in the dark (possibly requiring an examine scroll beforehand)
+
+Sorcerer (version 18):
+
+Spellbreaker (version 87):

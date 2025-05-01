@@ -1,5 +1,6 @@
 *.DAT
 *.dat
+*.z3
 *autosave_*
 zork1/zork1-r88*
 zork1/zork1.zip
