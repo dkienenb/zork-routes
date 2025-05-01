@@ -1,0 +1,225 @@
+proc restore {filename} {
+	send -- "restor\r"
+	send -- "autosave_$filename\r"
+	expect {
+		"Failed." {
+			exit 3
+		}
+		"Ok."
+	}
+}
+
+proc save {filename} {
+	send -- "save\r"
+	send -- "autosave_$filename\r"
+	expect {
+		"Overwrite" {
+			send -- "y\r"
+			exp_continue
+		}
+		"Failed." {
+			exit 2
+		}
+		"Ok."
+	}
+}
+
+proc repeat_until {save_name action good_ending {bad_ending "dkienenb1"} {instant_fail "dkienenb2"} {mid_expect ""} } {
+	save "$save_name"
+	while {true} {
+		set good 0
+		set bad 0
+		send "$action\r"
+		expect "$mid_expect"
+		while {true} {
+			expect {
+				-re "$instant_fail" {
+					puts "Reached instant fail condition: \"$instant_fail\""
+					repeatfailchecktriggered
+				}
+				-re "$good_ending" {
+					set good 1
+				}
+				-re "$bad_ending" {
+					set bad 1
+				}
+				">" {
+					break
+				}
+				"***MORE***" {
+					send "\r"
+				}
+				timeout {
+					kiagurbgsub
+				}
+			}
+		}
+		if {$good && !$bad} {
+			break
+		} else {
+			restore "$save_name"
+		}
+	}
+}
+
+proc go_dark {direction} {
+	repeat_until dark_move "$direction" "Score" "slithered alongside you"
+}
+
+proc summon_advent {direction} {
+	save "summon_advent"
+	while {true} {
+		set advent 0
+		send "$direction\r"
+		expect {
+			"eastern end of the Hall of Mirrors." {}
+			"long Hall of Mirrors" {}
+		}
+		while {true} {
+			expect {
+				"glowing dimly" {
+					set advent 1
+				}
+				"compass" {
+					set advent 0
+				}
+				">" {
+					break
+				}
+				timeout {
+					kiagurbgsub
+				}
+			}
+		}
+		if {!$advent} {
+			restore "summon_advent"
+		} else {
+			break
+		}
+	}
+	send "zifmia advent\r"
+}
+
+proc advent_takes_items {action outcome} {
+	save "advent_steal"
+	while {true} {
+		set map 0
+		set pencil 0
+		set purple 0
+		send "$action\r"
+		expect "$outcome"
+		while {true} {
+			expect {
+				"purple" {
+					set purple 1
+				}
+				"map" {
+					set map 1
+				}
+				"pencil" {
+					set pencil 1
+				}
+				">" {
+					break
+				}
+				timeout {
+					kiagurbgsub
+				}
+			}
+		}
+		if {!$map || !$pencil} {
+			restore "advent_steal"
+		} else {
+			break
+		}
+	}
+}
+
+proc mirror_hall_dynamic {} {
+	send "e\re\r"
+	save dynamic
+	set three 0
+	set four 0
+	while {true} {
+		set three 0
+		set four 0
+		send "e\r"
+		expect "a spot within the long"
+		expect {
+			"stops and stares in your direction" {
+				set three 1
+				exp_continue
+			}
+			"He stares in your direction but seems not to see you."  {
+				set four 1
+				exp_continue
+			}
+			"deep in thought" {
+				set four 1
+				exp_continue
+			}
+			">" {
+				restore dynamic
+				if {$three || $four} {
+					break
+				}
+			}
+		}
+	}
+	if {$three} {
+		summon_advent e
+		send "vaxum advent\re\r"
+	} else {
+		send "e\r"
+		summon_advent e
+		send "vaxum advent\r"
+	}
+}
+
+proc meetup_advent {} {
+	save meetup
+	set meetup 0
+	while {true} {
+		set meetup 0
+		send "get jug\re\re\re\rtake brittle and frayed\re\rne\re\rse\re\r"
+		expect "widens here to form a large hall."
+		expect {
+			"bedraggled and weary adventurer standing here" {
+				set meetup 1
+				exp_continue
+			}
+			"leaves the room" {
+				set meetup 0
+				exp_continue
+			}
+			">" {
+				if {$meetup} {
+					break
+				} else {
+					restore meetup
+				}
+			}
+		}
+	}
+}
+
+spawn -noecho dfrotz -mo /home/dkienenb/infocom/enchanter/enchante.dat
+set timeout 5
+send "\rverbose\rne\rn\rget jug\rfrotz jug\rblorb me\rget jug\rsw\rsw\rs\rne\rne\re\re\rgnusto rezrov\rmemori rezrov, rezrov, rezrov, rezrov\rrezrov gate\re\r"
+send "e\rs\rdrop jug\rs\re\rmove lighted\rtake scroll and candle\rozmoo me\re\rn\rn\rn\rsave\rrezrov door\rd\rw\rw\rs\rcut rope with knife\ropen box\rtake vellum, box, jug\rmelbor me\rs\re\re\re\ru\rse\rput old in jug\rdrop jug and knife\rnw\r"
+send "take jug and scroll\re\re\re\rn\rn\ru\rsmash egg\rtake shredded\rd\re\re\re\re\re\r"
+
+send "memori rezrov\rrezrov gate\rn\rget crumpled\rs\r"
+send "s\r" 
+send "follow rat tracks\r"
+send "reach in hole\r"
+send "s\rs\rs\rs\rw\rw\rw\ru\r"
+send "board\rkrebf shredded\rsleep\rstand\rpush button\rget leaf\rd\rn\rn\rgnusto vaxum\rmemori vaxum\r"
+send "drop brittle and frayed and book\rn\rn\r"
+
+mirror_hall_dynamic
+send "e\re\rpoint at door\r"
+advent_takes_items "memori vaxum, vaxum" "learn the vaxum spell"
+meetup_advent
+send "vaxum advent\rtake map and pencil\rs\rs\rs\rw\rw\rd\rd\rs\re\rconnect M and P\rthrow terror at jug\rse\rdrop box\rtake powerful\rnw\rw\rn\ru\ru\re\re\rn\rn\rn\re\re\rkulcad stair\rizyuk me\re\rgondar dragon\rvaxum shape\rguncho krill\r"
+expect "QUIT"

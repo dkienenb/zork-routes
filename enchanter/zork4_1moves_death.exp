@@ -1,0 +1,3 @@
+spawn -noecho dfrotz -mo /home/dkienenb/infocom/enchanter/enchante.dat
+send "blorb me\r"
+interact

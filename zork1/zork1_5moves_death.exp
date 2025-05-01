@@ -1,0 +1,15 @@
+#!/usr/bin/expect
+
+spawn dfrotz -op /home/dkienenb/infocom/zork1/ZORK1.DAT
+
+send "n\n"
+send "e\n"
+send "e\n"
+send "e\n"
+send "jump\n"
+expect "died"
+
+# or: n. n. walk around forest. e. jump
+# or: w. walk around forest. s. s. jump
+# or: s. e. e. e. jump
+# or: s. s. n. e. jump

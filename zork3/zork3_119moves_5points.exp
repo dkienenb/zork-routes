@@ -1,0 +1,318 @@
+spawn -noecho dfrotz -m /home/dkienenb/infocom/zork3/ZORK3.DAT
+set timeout 5
+proc restor {filename} {
+	send -- "restor\r"
+	send -- "autosave_$filename\r"
+	expect {
+		"Failed." {
+			exit 3
+		}
+		"Ok."
+	}
+}
+
+proc save {filename} {
+	send -- "save\r"
+	send -- "autosave_$filename\r"
+	expect {
+		"Overwrite" {
+			send -- "y\r"
+			exp_continue
+		}
+		"Failed." {
+			exit 2
+		}
+		"Ok."
+	}
+}
+
+set quakes 0
+while {true} {
+	save "init"
+	send -- "turn on\rs\rs\re\re\rs\rs\re\r"
+	expect {
+		"The great iron door is rusted shut\." {
+			send -- "e\r"
+			exp_continue
+		}
+		"Entrance" {
+			incr quakes
+			send -- "score\r"
+		}
+	}
+	expect ", in"
+	expect -r "(\[\[:digit:\]\]){2}"
+	set moves $expect_out(buffer)
+	expect "moves"
+	send "restart\ry\r"
+	if {$moves == 73} {
+		break
+	}
+}
+
+send -- "verbos\rturn on\rs\rw\rw\rd\rtie rope to chest\rthrow lamp at chest\rget it\rn\rn\rn\rn\rn\rn\rn\rn\rn\rn\rn\rgrab rope\rtake chest and bread\re\re\re\r"
+save "bread"
+while {true} {
+	set bread 0
+	send "ne\r"
+	expect "strange runes"
+	expect {
+		"snoring loudly" {
+			set bread 1
+			exp_continue
+		}
+		">" {
+			if {$bread == 0} {
+				restor "bread"
+				continue
+			} else {
+				break
+			}
+		}
+	}
+}
+send -- "wake\rgive bread\rsw\rw\rs\r"
+save "shadow"
+while { true } {
+	set progress_room 0
+	set found 0
+	set hurt 0
+	set blocked 0
+	expect {
+		"Your way is blocked by the hooded figure" {
+			set blocked 1
+			exp_continue
+		}
+		"dark, featureless landscape of shallow hills" {
+			set progress_room 1
+			exp_continue
+		}
+		"eerie, shadowy land" {
+			set progress_room 2
+			exp_continue
+		}
+		"appears in your hand, wildly glowing\!" {
+			set found 1
+			exp_continue
+		}
+		"catches you off guard and wounds you\!" {
+			set hurt 1
+			exp_continue
+		}
+		"You are wounded by a lightning thrust\!" {
+			set hurt 1
+			exp_continue
+		}
+		"You are hit\!" {
+			set hurt 1
+			exp_continue
+		}
+		"between your ribs" {
+			set hurt 1
+			exp_continue
+		}
+		">" {
+			if {$blocked == 1} {
+				restor "shadow"
+				continue
+			}
+			if {$hurt == 1} {
+				restor "shadow"
+				continue
+			}
+			if {$found == 1} {
+				send -- "put cloak and hood in chest\r"
+				set found 2
+				exp_continue
+			} else {
+				switch $progress_room {
+					"0" {
+						send -- "sw\r"
+						exp_continue
+					}
+					"1" {
+						send -- "se\r"
+						exp_continue
+					}
+					"2" {
+						if {$found == 2} {
+							break
+						} else {
+							restor "shadow"
+							continue
+						}						
+					}
+					default {
+						exp_continue
+					}
+				}
+			}
+		}
+	}
+}
+send -- "s\renter lake\rw\rs\rget torch\rtouch table\rget\re\rtouch table\rdrop torch\ri\rn\renter lake\rd\r"
+save "underwater"
+set watergrab 0
+while {true} {
+	set amulet 0
+	set can 0
+	set staff 0
+	set chest 0
+	set dead 0
+	send "take amulet, can, staff, chest\r"
+	expect {
+		"You reach the shiny object. It is a simple golden amulet!" {
+			set amulet 1
+			exp_continue
+		}
+		"Frobozz Magic Grue Repellent: Taken" {
+			set can 1
+			exp_continue
+		}
+		"wooden staff: Taken" {
+			set staff 1
+			exp_continue
+		}
+		"chest: Taken" {
+			set chest 1
+			exp_continue
+		}
+		"winding trail" {
+			set dead 1
+			exp_continue
+		}
+		">" {
+			if {$amulet == 0 || $can == 0 || $staff == 0 || $chest == 0 || $dead == 1} {
+				restor "underwater"
+				incr watergrab
+				continue
+			} else {
+				break
+			}
+		}
+	}
+}
+send -- "u\rs\rapply can to me\rs\rs\re\rput key in chest\r"
+save "deathgrind"
+set deathgrind 0
+while {true} {
+	set amulet 0
+	set can 0
+	set staff 0
+	set chest 0
+	send "kill\rs\re\r"
+	expect {
+		"golden amulet" {
+			set amulet 1
+			exp_continue
+		}
+		"Frobozz Magic Grue Repellent" {
+			set can 1
+			exp_continue
+		}
+		"There is a wooden staff here" {
+			set staff 1
+			exp_continue
+		}
+		"chest" {
+			set chest 1
+			exp_continue
+		}
+		"torch" {
+			if {$amulet == 0 || $can == 0 || $staff == 0 || $chest == 0} {
+				restor "deathgrind"
+				incr deathgrind
+				continue
+			} else {
+				break
+			}
+		}
+	}
+}
+send "get all\rne\ropen\rn\rn\rdrop can\rs\rs\rsw\rdrop all but chest\r"
+save "postgrind"
+set darkwalk 0
+set progress 0
+while {true} {
+	set eaten 0
+	expect {
+		"winding trail" {
+			set eaten 1
+			exp_continue
+		}
+		">" {
+			if {$eaten == 1} {
+				set progress [expr $progress - 1]
+				restor "darkwalk_$progress"
+				incr darkwalk
+				continue
+			} else {
+				save "darkwalk_$progress"
+				switch $progress {
+					"0" {
+						send -- "w\r"
+						expect ">"
+						set progress 1
+					}
+					"1" {
+						send -- "s\r"
+						expect ">"
+						set progress 2
+					}
+					"2" {
+						send -- "e\r"
+						expect ">"
+						set progress 3
+					}
+					"3" {
+						send -- "e\r"
+						expect ">"
+						set progress 4
+					}
+					"4" {
+						send -- "s\r"
+						expect ">"
+						set progress 5
+					}
+					"5" {
+						send -- "s\r"
+						expect ">"
+						set progress 6
+					}
+					"6" {
+						break
+					}
+				}
+				exp_continue
+			}
+		}
+	}
+}
+send -- "e\ropen stone door\re\runlock cage with ring\rw\rs\rd\rpush e wall\rs\rse\re\rpush s wall\rput book and ring in chest\r"
+expect "very ancient book"
+save "deathgrind2"
+while {true} {
+	set chest 0
+	send "kill\rs\re\r"
+	expect {
+		"chest" {
+			set chest 1
+			exp_continue
+		}
+		"torch" {
+			if {$chest == 0} {
+				restor "deathgrind2"
+				continue
+			} else {
+				break
+			}
+		}
+	}
+}
+send "take all\rne\rn\rpush button\rn\rn\rn\rraise short pole\rpush red,red\rlower short pole\rpush mahoga,mahoga,mahoga\rraise short pole\rpush white,white,white,white,pine\rn\rknock on door\rn\re\rn\rn\rturn dial to 4\rpush button\rs\ropen door\rs\rdungeon master, go n\rdungeon master, turn dial to 1\rdungeon master, push button\runlock bronze door with key\ropen bronze door\rs\r"
+expect "moves."
+send_user -- "\n(Quakefinder took $quakes retries.)\n"
+send_user -- "(Watergrab took $watergrab retries)\n"
+send_user -- "(Deathgrind took $deathgrind retries.)\n"
+send_user -- "(Darkwalk took $darkwalk restores.)\n"
+

@@ -1,0 +1,3 @@
+spawn dfrotz -pm /home/dkienenb/infocom/zork3/ZORK3.DAT
+send "kill\rkill\rkill\rkill\r"
+interact

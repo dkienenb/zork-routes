@@ -1,0 +1,3 @@
+spawn dfrotz -p /home/dkienenb/infocom/zork2/ZORK2.DAT
+send "get sword\rkill me with sword\r"
+interact

@@ -1,0 +1,4 @@
+spawn -noecho dfrotz -mo /home/dkienenb/infocom/enchanter/enchante.dat
+send "frotz me\r"
+#can the adventurer take the lighted painting if his lantern is removed? seems to be no, but maye he himself glows?
+interact

@@ -1,0 +1,73 @@
+(Thief starts in round room)
+East-West Passage
+Atlantis Room
+Twisting Passage
+Winding Passage
+Narrow Passage
+Cold Passage
+Cave
+Cave
+Mirror Room
+Mirror Room
+Stream View
+Reservoir North
+(Reservoir, if drained)
+Reservoir South
+Treasure Room
+Strange Passage
+Cyclops Room
+Maze
+Maze
+Maze
+Dead End
+Maze
+Grating Room
+Maze
+Maze
+Maze
+Dead End
+Maze
+Maze
+Maze
+Dead End
+Maze
+Dead End
+Maze
+Maze
+Maze
+Maze
+Studio
+Gallery
+East of Chasm
+The Troll Room
+Cellar
+Slide Room
+Coal Mine
+Coal Mine
+Coal Mine
+Coal Mine
+Machine Room
+Dead End
+Ladder Bottom
+Ladder Top
+Smelly Room
+Shaft Room
+Squeaky Room
+Mine Entrance
+End of Rainbow
+Sandy Cave
+Maintenance Room
+Dam Lobby
+Dam
+Torch Room
+Dome Room
+Egyptian Room
+Engravings Cave
+Land of the Dead
+Entrance to Hades
+Chasm
+North-South Passage
+Loud Room
+Damp Cave
+Deep Canyon
+Round Room

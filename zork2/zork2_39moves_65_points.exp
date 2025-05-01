@@ -1,0 +1,200 @@
+#!/usr/bin/expect
+proc save {name} {
+	while {true} {
+		send "save\n"
+		expect {
+			"filename" {
+				send "autosave_$name\n"
+				expect {
+					"Overwrite" {
+						send "y\n"
+						expect "Ok."
+					}
+					"Ok." {}
+				}
+				expect ">"
+				break
+			}
+			"You are frozen solid." {
+				expect ">"
+				send "z\n"
+			}
+		}
+	}
+}
+
+proc restore {name} {
+	while {true} {
+		send "restore\n"
+		expect {
+			"filename" {
+				send "autosave_$name\n"
+				expect "Ok."
+				expect ">"
+				break
+			}
+			"You are frozen solid." {
+				expect ">"
+				send "z\n"
+			}
+		}
+	}
+}
+
+proc repeat_until {save_name action good_ending {bad_ending "dkienenb1"} {instant_fail "dkienenb2"} } {
+	save "$save_name"
+	while {true} {
+		set good 0
+		set bad 0
+		send "$action\n"
+		while {true} {
+			expect {
+				-re "$instant_fail" {
+					puts "Reached instant fail condition: \"$instant_fail\""
+					repeatfailchecktriggered
+				}
+				-re "$good_ending" {
+					set good 1
+				}
+				-re "$bad_ending" {
+					set bad 1
+				}
+				">" {
+					break
+				}
+				"***MORE***" {
+					send "\n"
+					exp_continue
+				}
+				timeout {
+					kiagurbgsub
+				}
+			}
+		}
+		if {$good && !$bad} {
+			break
+		} else {
+			restore "$save_name"
+		}
+	}
+}
+
+proc repeat_until_maze_bad {} {
+	set save_name "maze_exit"
+	set dir "e"
+	save "$save_name"
+	while {true} {
+		set good 0
+		send "$dir\n"
+		while {true} {
+			expect {
+				"stairway" {
+					set good 1
+				}
+				">" {
+					break
+				}
+				"***MORE***" {
+					send "\n"
+					exp_continue
+				}
+				timeout {
+					kiagurbgsub
+				}
+			}
+		}
+		if {$good} {
+			break
+		} else {
+			restore "$save_name"
+			switch $dir {
+				"e" {
+					set dir "s"
+				}
+				"s" {
+					set dir "w"
+				}
+				"w" {
+					set dir "n"
+				}
+				"n" {
+					set dir "e"
+				}
+			}
+		}
+	}
+}
+
+proc get {item} {
+	repeat_until get "get $item" "Taken" "holding too many" "Your load is too heavy."
+}
+
+proc cast {save_name action cast_effect_msg cast_wearoff_msg wait_action turns_goal} {
+	save "pre_cast_$save_name"
+	while {true} {
+		repeat_until "mid_cast_$save_name" "$action" "$cast_effect_msg" "gaming"
+		save "post_cast_$save_name"
+		set turns 0
+		while {true} {
+			incr turns
+			send "$wait_action\n"
+			expect {
+				-re "$cast_wearoff_msg" {
+					break
+				}
+				">" {
+					continue
+				}
+			}
+		}
+		if {[expr $turns == $turns_goal]} {
+			break
+		} else {
+			restore "pre_cast_$save_name"
+		}
+	}
+	restore "post_cast_$save_name"
+}
+
+spawn dfrotz -p /home/dkienenb/infocom/zork2/ZORK2.DAT
+send "light\n"
+send "s\n"
+send "s\n"
+repeat_until bushy s "bushy"
+send "pour wand\n"
+send "sw\n"
+send "s\n"
+send "sw\n"
+send "sw\n"
+repeat_until carousel s "Menhir"
+send "g\n"
+cast float g "into the air" "perfect health" "diagno" 7
+send "g\n"
+send "pour lamp\n"
+send "diagno\n"
+send "diagno\n"
+send "diagno\n"
+send "diagno\n"
+send "get wand and lamp\n"
+send "wave wand at menhir\n"
+send "say \"float\"\n"
+cast feeble sw "very tired" "perfect health" "diagno" 12
+send "get collar and lamp\n"
+send "ne\n"
+send "s\n"
+send "d\n"
+repeat_until club e "club"
+send "se\n"
+send "ne\n"
+send "nw\n"
+send "sw\n"
+repeat_until_maze_bad
+send "d\n"
+send "put collar on dog\n"
+send "e\n"
+send "d\n"
+repeat_until fumble "open crypt door" "dropped the lamp"
+send "s\n"
+send "open f\n"
+send "s\n"
+expect points

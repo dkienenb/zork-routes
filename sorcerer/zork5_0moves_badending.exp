@@ -1,0 +1,3 @@
+spawn -noecho dfrotz -mo /home/dkienenb/infocom/sorcerer/sorcerer-r18-s860904.z3
+set timeout 5
+send "wake up\r"
