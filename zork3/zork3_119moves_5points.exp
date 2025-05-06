@@ -1,4 +1,4 @@
-spawn -noecho dfrotz -m /home/dkienenb/infocom/zork3/ZORK3.DAT
+spawn -noecho dfrotz -m ./ZORK3.DAT
 set timeout 5
 proc restor {filename} {
 	send -- "restor\r"
@@ -185,6 +185,7 @@ while {true} {
 			if {$amulet == 0 || $can == 0 || $staff == 0 || $chest == 0 || $dead == 1} {
 				restor "underwater"
 				incr watergrab
+				# might need an extra expect here
 				continue
 			} else {
 				break
@@ -288,7 +289,9 @@ while {true} {
 		}
 	}
 }
-send -- "e\ropen stone door\re\runlock cage with ring\rw\rs\rd\rpush e wall\rs\rse\re\rpush s wall\rput book and ring in chest\r"
+# we actually don't need to put the book in the chest, but it reduces the RNG
+send -- "e\ropen stone door\re\runlock cage with ring\rw\rs\rd\rpush e wall\rs\rse\re\rpush s wall\r"
+send "put book and ring in chest\r"
 expect "very ancient book"
 save "deathgrind2"
 while {true} {
