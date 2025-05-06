@@ -1,13 +1,13 @@
 #!/usr/bin/expect
 proc save {name} {
 	while {true} {
-		send "save\n"
+		send "save\r"
 		expect {
 			"filename" {
-				send "autosave_$name\n"
+				send "autosave_$name\r"
 				expect {
 					"Overwrite" {
-						send "y\n"
+						send "y\r"
 						expect "Ok."
 					}
 					"Ok." {}
@@ -17,7 +17,7 @@ proc save {name} {
 			}
 			"You are frozen solid." {
 				expect ">"
-				send "z\n"
+				send "z\r"
 			}
 		}
 	}
@@ -25,17 +25,17 @@ proc save {name} {
 
 proc restore {name} {
 	while {true} {
-		send "restore\n"
+		send "restore\r"
 		expect {
 			"filename" {
-				send "autosave_$name\n"
+				send "autosave_$name\r"
 				expect "Ok."
 				expect ">"
 				break
 			}
 			"You are frozen solid." {
 				expect ">"
-				send "z\n"
+				send "z\r"
 			}
 		}
 	}
@@ -46,7 +46,7 @@ proc repeat_until {save_name action good_ending {bad_ending "dkienenb1"} {instan
 	while {true} {
 		set good 0
 		set bad 0
-		send "$action\n"
+		send "$action\r"
 		while {true} {
 			expect {
 				-re "$instant_fail" {
@@ -63,7 +63,7 @@ proc repeat_until {save_name action good_ending {bad_ending "dkienenb1"} {instan
 					break
 				}
 				"***MORE***" {
-					send "\n"
+					send "\r"
 					exp_continue
 				}
 				timeout {
@@ -85,7 +85,7 @@ proc repeat_until_maze_bad {} {
 	save "$save_name"
 	while {true} {
 		set good 0
-		send "$dir\n"
+		send "$dir\r"
 		while {true} {
 			expect {
 				"stairway" {
@@ -95,7 +95,7 @@ proc repeat_until_maze_bad {} {
 					break
 				}
 				"***MORE***" {
-					send "\n"
+					send "\r"
 					exp_continue
 				}
 				timeout {
@@ -137,7 +137,7 @@ proc cast {save_name action cast_effect_msg cast_wearoff_msg wait_action turns_g
 		set turns 0
 		while {true} {
 			incr turns
-			send "$wait_action\n"
+			send "$wait_action\r"
 			expect {
 				-re "$cast_wearoff_msg" {
 					break
@@ -156,45 +156,52 @@ proc cast {save_name action cast_effect_msg cast_wearoff_msg wait_action turns_g
 	restore "post_cast_$save_name"
 }
 
-spawn dfrotz -p /home/dkienenb/infocom/zork2/ZORK2.DAT
-send "light\n"
-send "s\n"
-send "s\n"
+spawn dfrotz -mp ./ZORK2.DAT
+set timeout 5
+send "light\r"
+send "s\r"
+send "s\r"
+expect "crude but sturdy"
 repeat_until bushy s "bushy"
-send "pour wand\n"
-send "sw\n"
-send "s\n"
-send "sw\n"
-send "sw\n"
+send "pour wand\r"
+send "sw\r"
+send "s\r"
+send "sw\r"
+send "sw\r"
+expect "whirring"
 repeat_until carousel s "Menhir"
-send "g\n"
+send "g\r"
+expect "not carrying the"
 cast float g "into the air" "perfect health" "diagno" 7
-send "g\n"
-send "pour lamp\n"
-send "diagno\n"
-send "diagno\n"
-send "diagno\n"
-send "diagno\n"
-send "get wand and lamp\n"
-send "wave wand at menhir\n"
-send "say \"float\"\n"
-cast feeble sw "very tired" "perfect health" "diagno" 12
-send "get collar and lamp\n"
-send "ne\n"
-send "s\n"
-send "d\n"
+send "g\r"
+send "pour lamp\r"
+send "diagno\r"
+send "diagno\r"
+send "diagno\r"
+send "diagno\r"
+send "get wand and lamp\r"
+send "wave wand at menhir\r"
+send "say \"float\"\r"
+expect "beckons"
+cast feeble sw "very tired" "perfect health" "diagno" 11
+send "get collar and lamp\r"
+send "ne\r"
+send "s\r"
+send "d\r"
+expect "some glassy substance"
 repeat_until club e "club"
-send "se\n"
-send "ne\n"
-send "nw\n"
-send "sw\n"
+send "se\r"
+send "ne\r"
+send "nw\r"
+send "sw\r"
+expect "glowing serenely"
 repeat_until_maze_bad
-send "d\n"
-send "put collar on dog\n"
-send "e\n"
-send "d\n"
+send "d\r"
+send "put collar on dog\r"
+send "e\r"
+expect "Feel Free"
 repeat_until fumble "open crypt door" "dropped the lamp"
-send "s\n"
-send "open f\n"
-send "s\n"
+send "s\r"
+send "open f\r"
+send "s\r"
 expect points
