@@ -1,22 +1,23 @@
 #!/usr/bin/expect
-proc save {name} {
-	send "save\n"
-	expect "filename"
-	send "autosave_$name\n"
+proc save {filename} {
+	send -- "save\r"
+	send -- "autosave_$filename\r"
 	expect {
 		"Overwrite" {
-			send "y\n"
-			expect "Ok."
+			send -- "y\r"
+			exp_continue
 		}
-		"Ok." {}
+		"Failed." {
+			exit 2
+		}
+		"Ok."
 	}
-	expect ">"
 }
 
 proc restore {name} {
-	send "restore\n"
+	send "restore\r"
 	expect "filename"
-	send "autosave_$name\n"
+	send "autosave_$name\r"
 	expect "Ok."
 	expect ">"
 }
@@ -26,7 +27,7 @@ proc repeat_until {save_name action good_ending {bad_ending "dkienenb1"} {instan
 	while {true} {
 		set good 0
 		set bad 0
-		send "$action\n"
+		send "$action\r"
 		while {true} {
 			expect {
 				-re "$instant_fail" {
@@ -43,7 +44,7 @@ proc repeat_until {save_name action good_ending {bad_ending "dkienenb1"} {instan
 					break
 				}
 				"***MORE***" {
-					send "\n"
+					send "\r"
 				}
 				timeout {
 					kiagurbgsub
@@ -62,270 +63,319 @@ proc get {item} {
 	repeat_until get "get $item" "Taken" "holding too many" "Your load is too heavy."
 }
 
-spawn dfrotz -op /home/dkienenb/infocom/zork1/ZORK1.DAT
-
-
+spawn dfrotz -opm ./ZORK1.DAT
+set timeout 5
 # Earlygame
-send "n\n"
-send "n\n"
-send "u\n"
+send "n\r"
+send "n\r"
+send "u\r"
 get egg
-send "d\n"
-send "s\n"
-send "e\n"
-send "open window\n"
-send "w\n"
-send "open sack\n"
+send "d\r"
+send "s\r"
+send "e\r"
+send "open window\r"
+send "w\r"
+send "open sack\r"
 get garlic
-send "w\n"
+send "w\r"
 get all
-send "light\n"
-send "move rug\n"
-send "open trap\n"
-send "d\n"
-send "s\n"
-send "e\n"
+send "light\r"
+send "move rug\r"
+send "open trap\r"
+send "d\r"
+send "s\r"
+send "e\r"
 # Open trapdoor via again bug
-send "g\n"
-send "w\n"
-send "n\n"
+send "g\r"
+send "w\r"
+send "n\r"
 repeat_until troll n "brightly" "nicks|died|skins|knocks"
 # now we don't have to carry the sword
 repeat_until feed "give sword to troll" "hungrily" "sated"
 
 # Travel to maintenence closet from troll room
-send "e\n"
-send "d\n"
-send "ne\n"
-send "e\n"
-send "n\n"
-send "n\n"
+send "e\r"
+send "d\r"
+send "ne\r"
+send "e\r"
+send "n\r"
+send "n\r"
 
 # River prep
-send "push yellow\n"
+send "push yellow\r"
 get "wrench and driver"
-send "s\n"
-send "s\n"
-send "turn bolt with wrench\n"
-send "d\n"
+send "s\r"
+send "s\r"
+send "turn bolt with wrench\r"
+send "d\r"
 get boat
-send "u\n"
+send "u\r"
 #saved too many moves need to wait for water to drain, if we could save two more we could echo here
-send "diagno\n"
-send "diagno\n"
-send "diagno\n"
-send "w\n"
-send "n\n"
-send "n\n"
-send "n\n"
-send "s\n"
+send "diagno\r"
+send "diagno\r"
+send "diagno\r"
+send "w\r"
+send "n\r"
+send "n\r"
+send "n\r"
+send "s\r"
 get pump
-send "s\n"
-send "s\n"
-send "se\n"
-send "d\n" 
-send "echo\n"
-send "e\n"
-send "e\n"
-send "drop boat and wrench and pump\n"
-send "inflate boat with pump\n"
-send "board\n"
-send "launch\n"
-send "diagno\n"
-send "diagno\n"
+send "s\r"
+send "s\r"
+send "se\r"
+send "d\r" 
+send "echo\r"
+send "e\r"
+send "e\r"
+send "drop boat and wrench and pump\r"
+send "inflate boat with pump\r"
+send "board\r"
+send "launch\r"
+send "diagno\r"
+send "diagno\r"
 
 # River
 get buoy
-send "e\n"
-send "stand\n"
-send "open buoy\n"
+send "e\r"
+send "stand\r"
+send "open buoy\r"
 get "shovel and emerald"
-send "ne\n"
-send "dig sand with shovel\n"
-send "g\n"
-send "g\n"
-send "g\n"
-send "sw\n"
-send "board\n"
-send "launch\n"
-send "w\n"
-send "stand\n"
+send "ne\r"
+send "dig sand with shovel\r"
+send "g\r"
+send "g\r"
+send "g\r"
+send "sw\r"
+send "board\r"
+send "launch\r"
+send "w\r"
+send "stand\r"
 
 # Travel to maze
-send "n\n"
-send "w\n"
-send "w\n"
-send "w\n"
-send "w\n"
-send "w\n"
+send "n\r"
+send "w\r"
+send "w\r"
+send "w\r"
+send "w\r"
+send "w\r"
 
 # Maze
-send "w\n"
-send "w\n"
-send "w\n"
-send "u\n"
+send "w\r"
+send "w\r"
+send "w\r"
+send "u\r"
 get coins
-send "sw\n"
-send "e\n"
-send "s\n"
+send "sw\r"
+send "e\r"
+send "s\r"
 repeat_until steal se "abstracted"
-send "ulysse\n"
+send "ulysse\r"
 
 # Temple
 repeat_until treasure u "dodge|back|misses|parry|twist away|haft" "blood|snake|cut"
-send "temple\n"
-send "e\n"
-send "drop buoy, shovel\n"
-send "open coffin\n"
+send "temple\r"
+send "e\r"
+send "drop buoy, shovel\r"
+send "open coffin\r"
 get "coffin and scepter"
-send "w\n"
+send "w\r"
 repeat_until treasure3 "treasure" "dodge|back|misses|parry|twist away|haft" "blood|snake|cut"
-send "give coffin to man\n"
+send "give coffin to man\r"
 
 # Hades
-send "temple\n"
+send "temple\r"
 get bell
-send "n\n"
+send "n\r"
 get torch
-send "s\n"
-send "s\n"
+send "s\r"
+send "s\r"
 get "black book and candles"
 repeat_until wind "d" "staircase" "candles!"
-send "d\n"
-send "drop candles\n"
-send "ring bell\n"
+send "d\r"
+send "drop candles\r"
+send "ring bell\r"
 get candles
-send "read black book\n"
-send "s\n"
-send "n\n"
+send "read black book\r"
+send "s\r"
+send "n\r"
 
 # Travel to mines
 repeat_until wind2 "u" "candles!"
-send "n\n"
-send "touch mirror\n"
-send "n\n"
-send "w\n"
+send "n\r"
+send "touch mirror\r"
+send "n\r"
+send "w\r"
 
 # Mines (1st part - get coal)
-send "n\n"
-send "w\n"
-send "n\n"
+send "n\r"
+send "w\r"
+send "n\r"
 get jade
-send "e\n"
-send "put garlic and torch and driver in basket\n"
+send "e\r"
+send "put garlic and torch and driver in basket\r"
 repeat_until bat w "Bottom" "Mine|Squeaky|Top"
-send "s\n"
-send "get coal\n"
-send "n\n"
-send "u\n"
-send "u\n"
-send "n\n"
-send "e\n"
-send "s\n"
-send "n\n"
+send "s\r"
+send "get coal\r"
+send "n\r"
+send "u\r"
+send "u\r"
+send "n\r"
+send "e\r"
+send "s\r"
+send "n\r"
 get bracelet
 repeat_until mines u "foul odor" "bag"
 repeat_until mines2 s "chain" "bag"
-send "put coal in basket\n"
-send "drop all\n"
-send "lower basket\n"
+send "put coal in basket\r"
+send "drop all\r"
+save "no_steal"
+while {true} {
+	send "lower basket\r"
 
-# Mines (2nd part - make diamond)
-repeat_until bat2 w "Top" "Mine|Squeaky|burdens"
-repeat_until mines3 d "dark place" "burdens"
-repeat_until mines4 w "dark place" "burdens"
-send "w\n"
-get "torch, driver, coal"
-send "s\n"
-send "open lid\n"
-send "put coal in machine\n"
-send "close lid\n"
-send "flip switch with driver\n"
+	# Mines (2nd part - make diamond)
+	repeat_until bat2 w "Top" "Mine|Squeaky|burdens"
+	repeat_until mines3 d "dark place" "burdens"
+	repeat_until mines4 w "dark place" "burdens"
+	send "w\r"
+	get "torch, driver, coal"
+	send "s\r"
+	send "open lid\r"
+	send "put coal in machine\r"
+	send "close lid\r"
+	send "flip switch with driver\r"
 
-# Mines (3rd part - leave)
-send "open lid\n"
-get diamond
-send "n\n"
-send "put all in basket\n"
-send "e\n"
-repeat_until mines5 e "dark place" "burdens"
-repeat_until mines6 u "dark place" "burdens"
-repeat_until mines7 u "dark place" "burdens"
-repeat_until mines8 n "dark place" "burdens"
-repeat_until mines9 e "dark place" "burdens"
-repeat_until mines10 s "dark place" "burdens"
-repeat_until mines11 n "dark place" "burdens"
-repeat_until mines12 u "dark place" "burdens"
-send "s\n"
-send "raise basket\n"
-get "diamond and torch and lamp and bracelet and jade and scepter"
-repeat_until bat3 w "Entrance" "Squeaky|Coal"
-send "s\n"
+	# Mines (3rd part - leave)
+	send "open lid\r"
+	get diamond
+	send "n\r"
+	send "put all in basket\r"
+	send "e\r"
+	repeat_until mines5 e "dark place" "burdens"
+	repeat_until mines6 u "dark place" "burdens"
+	repeat_until mines7 u "dark place" "burdens"
+	repeat_until mines8 n "dark place" "burdens"
+	repeat_until mines9 e "dark place" "burdens"
+	repeat_until mines10 s "dark place" "burdens"
+	repeat_until mines11 n "dark place" "burdens"
+	repeat_until mines12 u "dark place" "burdens"
+	send "s\r"
+	send "raise basket\r"
+	get "diamond and torch and lamp and bracelet and jade and scepter"
+	repeat_until bat3 w "Entrance" "Squeaky|Coal"
+	send "s\r"
 
-# Travel to thief (depositing some treasures)
-send "d\n"
-send "u\n"
-send "open case\n"
-send "put all but scepter and lamp in case\n"
-send "w\n"
-send "w\n"
-repeat_until treasure4 "u" "dodge|misses|parry|twist away" "blood|snake|cut|haft|fall back"
+	# Travel to thief (depositing some treasures)
+	send "d\r"
+	send "u\r"
+	send "open case\r"
+	send "put all but scepter and lamp in case\r"
+	send "w\r"
+	send "w\r"
+	repeat_until treasure4 "u" "dodge|misses|parry|twist away" "blood|snake|cut|haft|fall back"
 
-# Epic fight scene
-repeat_until fight "kill man with scepter" "Score" "blood|snake|cut|haft|fall back|flat of the blade|by an inch|on guard|nimbly aside|by a mile|regains|nimbly retrieves|thief dodges|pinks|thief parries|shallow gash|struck on the arm|cracks you on the skull"
-repeat_until fight2 "kill man with scepter" "Score" "blood|snake|cut|haft|fall back|flat of the blade|by an inch|on guard|nimbly aside|by a mile|regains|nimbly retrieves|thief dodges|pinks|thief parries|shallow gash|struck on the arm|cracks you on the skull"
-repeat_until kill "kill man with scepter" "Score" "blood|snake|cut|haft|fall back|flat of the blade|by an inch|on guard|nimbly aside|by a mile|regains|nimbly retrieves|thief dodges|pinks|thief parries|shallow gash|struck on the arm|cracks you on the skull|serious|deep gash|savage blow|dreamland|unconsciousness|knocked out!"
-# note that the thief will rarely not take the scarab, which will not cause issues until right at the end, but you first notice it here.
+	# Epic fight scene
+	repeat_until fight "kill man with scepter" "Score" "blood|snake|cut|haft|fall back|flat of the blade|by an inch|on guard|nimbly aside|by a mile|regains|nimbly retrieves|thief dodges|pinks|thief parries|shallow gash|struck on the arm|cracks you on the skull"
+	repeat_until fight2 "kill man with scepter" "Score" "blood|snake|cut|haft|fall back|flat of the blade|by an inch|on guard|nimbly aside|by a mile|regains|nimbly retrieves|thief dodges|pinks|thief parries|shallow gash|struck on the arm|cracks you on the skull"
+	repeat_until kill "kill man with scepter" "Score" "blood|snake|cut|haft|fall back|flat of the blade|by an inch|on guard|nimbly aside|by a mile|regains|nimbly retrieves|thief dodges|pinks|thief parries|shallow gash|struck on the arm|cracks you on the skull|serious|deep gash|savage blow|dreamland|unconsciousness|knocked out!"
+	save test
+	send "l\r"
+	expect "east wall is solid granite"
+	set scarab 0
+	set skull 0
+	set painting 0
+	set bar 0
+	expect {
+		"painting" {
+			set painting 1
+			exp_continue
+		}
+		"scarab" {
+			set scarab 1
+			exp_continue
+		}
+		"skull" {
+			set skull 1
+			exp_continue
+		}
+		"platinum" {
+			set bar 1
+			exp_continue
+		}
+		">" {
+			if {$scarab && $skull && $painting && $bar} {
+				restore test
+				break
+			} else {
+				restore no_steal 
+				continue
+			}
+		}
+	}
+}
+
+if {0} {
+  A beautiful jeweled scarab
+  A crystal skull
+  A gold coffin
+  A leather bag of coins
+  A large emerald
+  A jewel-encrusted egg, with a golden clockwork canary
+  A painting
+  A platinum bar
+  A crystal trident
+  A trunk of jewels
+  Chalice
+}
 
 # Cart treasure trip 1 - also getting pot and bauble here
 get "canary and bar and cup and trident"
-send "temple\n"
-send "s\n"
-send "pray\n"
-send "wind canary\n"
+send "temple\r"
+send "s\r"
+send "pray\r"
+send "wind canary\r"
 get bauble
-send "s\n"
-send "n\n"
-send "e\n"
-send "d\n"
-send "d\n"
-send "n\n"
-send "wave scepter\n"
+send "s\r"
+send "n\r"
+send "e\r"
+send "d\r"
+send "d\r"
+send "n\r"
+send "wave scepter\r"
 get pot
-send "sw\n"
-send "u\n"
-send "u\n"
-send "nw\n"
-send "w\n"
-send "w\n"
-send "w\n"
-send "put all but lamp in case\n\n"
-send "w\n"
-send "w\n"
-send "u\n"
+send "sw\r"
+send "u\r"
+send "u\r"
+send "nw\r"
+send "w\r"
+send "w\r"
+send "w\r"
+send "put all but lamp in case\r\r"
+send "w\r"
+send "w\r"
+send "u\r"
 
 # Cart treasure trip 2
 get "coffin and painting and egg and emerald"
-send "d\n"
-send "e\n"
-send "e\n"
-send "put all but lamp in case\n"
-send "w\n"
-send "w\n"
-send "u\n"
+send "d\r"
+send "e\r"
+send "e\r"
+send "put all but lamp in case\r"
+send "w\r"
+send "w\r"
+send "u\r"
 
 # Cart treasure trip 3
 get "trunk, coins, skull, scarab"
-send "d\n"
-send "e\n"
-send "e\n"
-send "put all but lamp in case\n"
+send "d\r"
+send "e\r"
+send "e\r"
+send "put all in case\r"
 
 # Endgame
-send "e\n"
-send "e\n"
-send "s\n"
-send "w\n"
-send "sw\n"
-send "enter\n"
+send "e\r"
+send "e\r"
+send "s\r"
+send "w\r"
+send "sw\r"
+send "enter\r"
 expect "zork"
