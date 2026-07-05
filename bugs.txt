@@ -24,6 +24,8 @@ The only item covered by the rising reservoir is the trunk of jewels.
 You can take the chalice if the thief is knocked unconscious, but not the other treasures.
 The raft and pile of plastic are two separate objects - you can carry a lot by filling the raft with (non-sharp) objects, deflating it, and picking up the pile of plastic.
 The thief will never rob the maze rooms, unless you are in them.
+The sword can be put in a container (boat, coffin) and keeps its lit state. When fully glowing this is 2 additional points.
+UNTESTED you can take items that the thief is carrying, even if he is invisible.
 
 Zork2 (version 48):
 The `again` bug - the again command doesn't check scope. The directions are (usually) not registered with again.
@@ -42,6 +44,7 @@ Throwing anything at the robot destroys the robot, but you keep the item you thr
 You can put more than one object in the balloon receptacle, but only when not in the basket.
 You can unlock the oak door with `turn key with x`, regardless of whether or not the door is there.
 `read`ing objects from the bucket works for take, but normal take does not.
+The demon will keep giving you points for treasures (such as those obtained with "get it")
 
 Zork3 (version 17):
 The `it` bug - once an it is set (via command, or a description), the game doesn't check that it is still in scope.
